@@ -5,7 +5,7 @@ Windows command-line app to show handle information
 * due to blocking on pipes, threads are used to query for information
 * just one somewhat undocumented call is used
 
-Usage infomration:
+Usage information:
 
     usage:         ohandle [-p:PID] [-v] [pattern]
       arguments:   -a           All handles, not just disk files
