@@ -1,7 +1,7 @@
 // Prints open handles
 // By default, only shows disk file handles. Use -a to show all handles.
-// Due to the security settings of some process, not all data is shown.
-// Due to Windows bugs with querying named pipes, not all of those are shown.
+// Due to the security settings of some processes, not all data is shown.
+// Due to Windows design issues when querying named pipes, not all of those are shown.
 // Due to inherent race conditions between getting all handles and enumerating them, some are not shown.
 // Due to some handle types not supporting duplication, some are not shown.
 // Most of these issues have been solved by creating and installing device drivers. There are
@@ -250,6 +250,9 @@ int begins_with( const char * str, const char * start )
         start++;
     }
 
+    if ( *start )
+        return false; // str is shorter than start
+
     return true;
 } //begins_with
 
@@ -304,7 +307,7 @@ ULONGLONG FindProcess( const char * pname )
     return INVALID_PID_VALUE;
 } //FindProcess
 
-// return true if pat is found in str case-insensitive. assume pat is all lowercase already.
+// return true if pattern is found in str case-insensitive. assume pat is all lowercase already.
 bool fstristr( const char * str, const char * pat )
 {
     while ( *str )
@@ -518,7 +521,7 @@ int main( int argc, char *argv[] )
                     if ( FILE_TYPE_DISK != fileType )
                     {
                         if ( verbose )
-                            printf( "  skipping file type %u == %s because it's not DISK\n", fileType, FileTypeString( fileType ) );
+                            printf( "  skipping file type %u == %s because it may cause a hang\n", fileType, FileTypeString( fileType ) );
                         continue;
                     }
 
@@ -556,7 +559,7 @@ int main( int argc, char *argv[] )
                         }
                     }
                     else if ( verbose )
-                        printf( "  pid %llu unable to get path of handle, error %d\n", sh.pid, GetLastError() );
+                        printf( "  pid %llu unable to get path of handle %8llu, error %d\n", sh.pid, (ULONGLONG) sh.handleValue, GetLastError() );
                 }
             }
         }
